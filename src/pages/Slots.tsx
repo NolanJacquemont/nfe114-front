@@ -44,7 +44,8 @@ function Home() {
                 label="Date et heure"
                 value={date}
                 onChange={(date) => {
-                    setDate(date);
+                    if (date)
+                        setDate(date);
                 }}
                 minDateTime={new Date()}
                 sx={{ width: 300, mt: 2 }}
