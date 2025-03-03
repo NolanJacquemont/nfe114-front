@@ -3,7 +3,7 @@ import {Box, Select, Typography} from "@mui/material";
 import {useNavigate, useParams} from "react-router-dom";
 import {useState} from "react";
 import {Slot} from "../models/Slot.ts";
-import {createAppointment, getFreeSlots, getPractitioner, getSlots} from "../rest/queries.ts";
+import {createAppointment, getFreeSlots, getPractitioner} from "../rest/queries.ts";
 import {Practitioner} from "../models/User.ts";
 import MenuItem from "@mui/material/MenuItem";
 import Button from "@mui/material/Button";
@@ -29,7 +29,7 @@ function TakeAppointment() {
         navigate("/practitioners");
     } else {
         if (freeSlots === null) {
-            getFreeSlots(practitionerId).then((response) => {
+            getFreeSlots(parseInt(practitionerId)).then((response) => {
                 if (response.responseCode === 200) {
                     // @ts-ignore
                     setFreeSlots(response.data);
@@ -63,14 +63,18 @@ function TakeAppointment() {
                 variant={"outlined"}
                 sx={{width: 500, mt: 2}}
                 title={"Choisissez un créneau"}
-                value={selectedSlot}
-                onChange={(event) => setSelectedSlot(event.target.value)}
+                value={selectedSlot?.id}
+                onChange={(event) => {
+                    if (event.target.value) {
+                        setSelectedSlot(freeSlots?.find(slot => slot.id === event.target.value) || null);
+                    }
+                }}
             >
                 {freeSlots?.sort((a, b) =>
                     new Date(a.time).getTime() - new Date(b.time).getTime()
                 )
                     .map((slot) => (
-                        <MenuItem key={slot.id} value={slot}>
+                        <MenuItem key={slot.id} value={slot.id}>
                             {
                                 new Date(slot.time).toLocaleDateString() + " - " + new Date(slot.time).toLocaleTimeString()
                             }
